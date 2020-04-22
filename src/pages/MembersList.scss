@@ -1,0 +1,17 @@
+.members-table {
+  &__header {
+    color: gray;
+    white-space: nowrap;
+    & > td {
+      padding-right: 2rem;
+      border-top: 0 !important;
+      border-bottom: 1px solid cadetblue;
+    }
+  }
+  &__row {
+    & > td {
+      border-top: 0 !important;
+      border-bottom: 1px solid dimgrey;
+    }
+  }
+}
