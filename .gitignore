@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+package-lock.json
 
 # Firebase cache
 .firebase/
@@ -20,11 +21,8 @@
 .vscode/settings.json
 .idea/
 *.iml
+*-debug.log
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-yarn.lock
 
 # misc
 browserstack.err
