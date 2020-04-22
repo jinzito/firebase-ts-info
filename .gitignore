@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 
+# Firebase cache
+.firebase/
+
 # testing
 /.scannerwork
 /coverage
