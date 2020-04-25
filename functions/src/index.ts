@@ -1,59 +1,58 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { CallableContext } from "firebase-functions/lib/providers/https";
-import ListUsersResult = admin.auth.ListUsersResult;
 
 export const helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase1y!");
+  response.send("Hello from Firebase 2");
 });
 
 admin.initializeApp();
-
-export const addAdminRole = functions.https.onCall((data, context: CallableContext) => {
-  //get user and add custom claims
-  return admin.auth().getUserByPhoneNumber(data.phoneNumber).then(user => {
-    return admin.auth().setCustomUserClaims(user.uid, {
-      isAdmin: true
-    });
-  }).then(() => {
-    return {
-      message: `Success${data.phoneNumber} has been made an admin`
-    };
-  }).catch(err => {
-    return err;
-  });
-});
 
 enum FunctionsErrorCode {
   UNAUTHENTICATED = "unauthenticated",
   FAILED_PRECONDITION = "failed-precondition"
 }
 
+const throwError = (message: string, type: FunctionsErrorCode = FunctionsErrorCode.FAILED_PRECONDITION) => {
+  throw new functions.https.HttpsError(
+    type,
+    message
+  );
+};
+
 const validateMember = (data: any): boolean => {
   const { displayName = "", phoneNumber, house = "", apt = "", aptSquare = "", isMember } = data;
   if (!phoneNumber || !displayName) {
-    throw new functions.https.HttpsError(
-      FunctionsErrorCode.FAILED_PRECONDITION,
+    throwError(
       "Created Member must have at least 'phoneNumber' and 'displayName'"
     );
   }
-  if (isMember && !(house | apt | aptSquare)) {
-    throw new functions.https.HttpsError(
-      FunctionsErrorCode.FAILED_PRECONDITION,
+  if (isMember && !(house || apt || aptSquare)) {
+    throwError(
       "To make user member you need ti specify 'house', 'apt' and 'ptSquare' params"
     );
   }
   return true;
 };
 
+interface CustomClaims {
+  isAdmin?: boolean;
+  isMember?: boolean;
+  isCurator?: boolean;
+}
+
 const checkAdminRights = async (context: CallableContext) => {
-  const { getUser } = admin.auth();
-  const userUid = context?.auth?.uid || "";
-  const callerUserRecord = await getUser(userUid);
-  if (!callerUserRecord?.customClaims?.isAdmin || callerUserRecord?.customClaims?.admin) {
-    throw new functions.https.HttpsError(
-      FunctionsErrorCode.FAILED_PRECONDITION,
-      "Only Admin users can create new users."
+
+  if (context.auth?.uid == "DnYgTkebIQQ7XTQu0MZnVCWcKTf2") {
+    // super admin
+    return true;
+  }
+  const callerUserRecord = await admin.auth().getUser(context.auth?.uid || "");
+  const cc: CustomClaims = callerUserRecord.customClaims as CustomClaims;
+  if (!cc?.isAdmin) {
+    throwError(
+      "Only Admin users can manage Members.",
+      FunctionsErrorCode.UNAUTHENTICATED
     );
   }
   return true;
@@ -61,31 +60,12 @@ const checkAdminRights = async (context: CallableContext) => {
 
 const checkAuth = (context: CallableContext) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
-      FunctionsErrorCode.UNAUTHENTICATED,
-      "The user is not authenticated. Only authenticated Admin users can create new users."
+    throwError(
+      "The user is not authenticated. Only authenticated Admin users can create new users.",
+      FunctionsErrorCode.UNAUTHENTICATED
     );
   }
 };
-
-
-export const getMembersList = functions.https.onCall(async (data, context: CallableContext) => {
-
-  checkAuth(context);
-  await checkAdminRights(context);
-
-  const { listUsers } = admin.auth();
-  const list: ListUsersResult = await listUsers(1000, data?.pageToken);
-  const members = list.users.map((user: admin.auth.UserRecord) => {
-    const { phoneNumber, displayName } = user;
-    const { house, apt, aptSquare, isMember, isCurator, isAdmin } = user?.customClaims || {};
-    return { ...{ phoneNumber, displayName, house, apt, aptSquare, isMember, isCurator, isAdmin } };
-  });
-  return {
-    pageToken: list.pageToken,
-    members
-  };
-});
 
 export const createMember = functions.https.onCall(async (data, context: CallableContext) => {
 
@@ -93,17 +73,41 @@ export const createMember = functions.https.onCall(async (data, context: Callabl
     await checkAdminRights(context);
     validateMember(data);
 
-    const { createUser, setCustomUserClaims } = admin.auth();
+    const { phoneNumber, displayName, house, apt, isAdmin = false, isMember = false, isCurator = false, aptSquare } = data;
 
-    const { phoneNumber, displayName } = data;
-    const newUser = { phoneNumber, displayName, disabled: false };
-    const userRecord = await createUser(newUser);
-    const userId = userRecord.uid;
+    try {
+      const existedUser = await admin.auth().getUserByPhoneNumber(phoneNumber);
+      if (existedUser && existedUser.uid) {
+        throwError(`Member already exist`);
+      }
+    } catch (e3) {
+      console.log("e3", e3);
+    }
 
-    const { house = "", apt = "", aptSquare = "", isAdmin, isMember, isCurator } = data;
-    const claims = { house, apt, aptSquare, isAdmin, isMember, isCurator };
-    await setCustomUserClaims(userId, claims);
+    let memberId = ""
+    try {
+      const newUser = { phoneNumber, displayName, disabled: false };
+      const userRecord = await admin.auth().createUser(newUser);
+      memberId = userRecord.uid;
+    } catch (createUserError) {
+      throwError(`auth createUser error:${createUserError.message}`);
+    }
 
-    return { result: 'The new Member has been successfully created.' };
+    const claims = { isAdmin, isMember, isCurator };
+    try {
+      await admin.auth().setCustomUserClaims(memberId, claims);
+    } catch (e) {
+      throwError(`setCustomUserClaims ${memberId} ${claims} error:${e.message}`);
+    }
+
+    try {
+      const member = { phoneNumber, displayName, house, apt, isAdmin, isMember, isCurator, aptSquare }
+      await admin.firestore().collection("members").doc(memberId).set(member);
+      return { member };
+    } catch (membersCollectionError) {
+      throwError(`add to members collection error:${membersCollectionError?.message}`);
+    }
+
+    return undefined;
   }
 );
