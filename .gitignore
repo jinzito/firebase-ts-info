@@ -29,4 +29,4 @@ browserstack.err
 debug.log
 report/*.xml
 
-_images
+/_images
