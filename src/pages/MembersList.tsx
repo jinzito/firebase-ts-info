@@ -5,20 +5,7 @@ import MaterialTable from "material-table";
 import { isEmpty } from "lodash";
 
 import './MembersList.scss';
-
-
-const membersRef = firestore().collection('members');
-const addMember = (newData: MemberVO): Promise<any> => {
-
-  const { apt, aptSquare, house, phone } = newData || {};
-
-  if (isEmpty(apt) || isEmpty(aptSquare) || isEmpty(house) || isEmpty(phone)) {
-    throw new Error("missed some Members params");
-  }
-  const id: string = `${house}-${apt}`;
-
-  return membersRef.doc(id).set(newData);
-};
+import { createMember, updateMember, deleteMember } from "../config/firebase";
 
 const MembersList: React.FC = () => {
 
@@ -26,28 +13,72 @@ const MembersList: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  const onAddMember = async (newData: MemberVO): Promise<any> => {
+    const { apt, aptSquare, house, phoneNumber } = newData || {};
+    if (isEmpty(apt) || isEmpty(aptSquare) || isEmpty(house) || isEmpty(phoneNumber)) {
+      throw new Error("missed some Members params");
+    }
+    try {
+      setIsLoading(true);
+      const result = await createMember(newData);
+      return new Promise((resolve) => {
+        setList([...list, result?.data]);
+        setIsLoading(false);
+        resolve();
+      });
+    } catch (e) {
+      setIsLoading(false);
+      setErrorMessage(e.message);
+    }
+  };
+
+  const onUpdateMember = async (newData: MemberVO): Promise<any> => {
+    const { apt, aptSquare, house, phoneNumber } = newData || {};
+    if (isEmpty(apt) || isEmpty(aptSquare) || isEmpty(house) || isEmpty(phoneNumber)) {
+      throw new Error("missed some Members params");
+    }
+    try {
+      setIsLoading(true);
+      const result = await updateMember(newData);
+      return new Promise((resolve) => {
+        const updatedMember: MemberVO = result?.data;
+        const newList: MemberVO[] = list.map(m => m.uid === updatedMember.uid ? updatedMember : m);
+        setList(newList);
+        setIsLoading(false);
+        resolve();
+      });
+    } catch (e) {
+      setIsLoading(false);
+      setErrorMessage(e.message);
+    }
+  };
+
+  const onDeleteMember = async(data: MemberVO): Promise<any> => {
+    const { uid } = data || {};
+    try {
+      setIsLoading(true);
+      const result = await deleteMember(uid);
+      return new Promise((resolve) => {
+        const deletedUid: string = result?.data;
+        const newList: MemberVO[] = list.filter((m => m.uid !== deletedUid));
+        setList(newList);
+        setIsLoading(false);
+        resolve();
+      });
+    } catch (e) {
+      setErrorMessage(e.message);
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
     (async () => {
       const result: MemberVO[] = [];
       try {
-        // tslint:disable:no-console
-        // const qs: any = await firestore().collection('members').doc("6_145").get();
-        // console.log("1qs:", qs.data());
-
-        // const mm: any = await firestore().collection('phone_2_member_id').doc("+375291234567").get();
-        // console.log(">mm:", mm.data());
-        const mem: any = await firestore().collection('members').doc("+375293611358").get();
-        console.log(">mem:", mem.data());
-
-        const mem1: any = await firestore().collection('members').doc("+375291234567").get();
-        console.log(">mem:", mem1.data());
-
-
         const qs: firestore.QuerySnapshot = await firestore().collection('members').get();
         qs.forEach((doc) => {
           result.push(doc.data() as MemberVO);
         });
-
       } catch (e) {
         setErrorMessage(e?.message);
       }
@@ -64,34 +95,27 @@ const MembersList: React.FC = () => {
       isLoading={isLoading}
       options={{
         actionsColumnIndex: -1,
-        paging: false
+        paging: false,
+        addRowPosition: "first",
+        loadingType: "linear",
+        draggable: false
       }}
       columns={[
-        { title: "Phone", field: "phone" },
-        { title: "Name", field: "name" },
+        { title: "Phone", field: "phoneNumber" },
+        { title: "Name", field: "displayName" },
         { title: "House", field: "house", lookup: { 5: "5", 6: "6", 7: "7" } },
         { title: "Apt", field: "apt", type: "numeric" },
         { title: "AptSquare", field: "aptSquare", type: "numeric" },
         { title: "admin", field: "isAdmin", type: "boolean" },
         { title: "curator", field: "isCurator", type: "boolean" },
-        { title: "member", field: "isMember", type: "boolean" },
+        { title: "member", field: "isMember", type: "boolean", initialEditValue: true },
       ]}
       data={list}
       editable={{
         isEditable: () => true,
-        onRowAdd: addMember,
-        onRowUpdate: (newData, oldData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 600);
-          }),
-        onRowDelete: (oldData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 600);
-          }),
+        onRowAdd: (data) => onAddMember(data),
+        onRowUpdate: (data) => onUpdateMember(data),
+        onRowDelete: (data) => onDeleteMember(data)
       }}
     />
   </div>);

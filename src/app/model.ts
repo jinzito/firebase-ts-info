@@ -5,9 +5,9 @@ export interface FirebaseVO {
 }
 
 export interface MemberVO extends DocumentData {
-  name?: string;
-  email?: string;
-  phone?: string;
+  uid?: string
+  displayName?: string;
+  phoneNumber?: string;
   house?: string;
   apt?: string;
   aptSquare?: string;

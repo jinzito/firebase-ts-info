@@ -12,8 +12,8 @@ import { authInstance } from "../config/firebase";
 import { firestore } from "firebase";
 import { isEmpty } from "lodash";
 import { MemberVO } from "../app/model";
-import { DocumentSnapshot } from '@firebase/firestore-types';
-
+import { DocumentSnapshot, DocumentData } from '@firebase/firestore-types';
+import { IdTokenResult } from '@firebase/auth-types';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,21 +33,29 @@ const AppHeader: React.FC = () => {
   const [userName, setUserName] = useState();
 
   useEffect(() => {
-    authInstance.onAuthStateChanged(setUser);
+    authInstance.onAuthStateChanged(async (user) => {
+      if (user) {
+        const token: IdTokenResult = await user.getIdTokenResult();
+        console.log("> claims:", token?.claims);
+        console.log(`> isAdmin:${!!token?.claims?.isAdmin} isCurator:${!!token?.claims?.isCurator} isMember:${!!token?.claims?.isMember}`);
+      }
+      setUser(user);
+    });
   }, []);
 
   useEffect(() => {
     (async () => {
       try {
         if (!isEmpty(user.uid)) {
-          const memberDoc: DocumentSnapshot<MemberVO> = await firestore().collection('members').doc(user.uid).get();
-          const member: MemberVO = memberDoc.exists && memberDoc.data();
-          setUserName(member.phone)
+          const memberDoc: DocumentSnapshot<DocumentData> = await firestore().collection('members').doc(user.uid).get();
+          const member: MemberVO = memberDoc.exists && memberDoc.data() as MemberVO;
+          console.log("> memberVO:", member);
+          setUserName(member.phone);
         } else {
           setUserName(undefined);
         }
       } catch (e) {
-          setUserName(undefined);
+        setUserName(undefined);
       }
     })();
   }, [user]);

@@ -67,6 +67,19 @@ const checkAuth = (context: CallableContext) => {
   }
 };
 
+const getUserByUid = async (uid: string) => {
+  try {
+    const user =  await admin.auth().getUser(uid);
+    if (!user?.uid) {
+      throwError(`auth getUser error: wrong uid`);
+    }
+    return user;
+  } catch (getUserError) {
+      throwError(`auth getUser error: ${getUserError.message}`);
+  }
+  return null;
+}
+
 export const createMember = functions.https.onCall(async (data, context: CallableContext) => {
 
     checkAuth(context);
@@ -84,30 +97,107 @@ export const createMember = functions.https.onCall(async (data, context: Callabl
       console.log("e3", e3);
     }
 
-    let memberId = ""
+    let uid = "";
     try {
       const newUser = { phoneNumber, displayName, disabled: false };
       const userRecord = await admin.auth().createUser(newUser);
-      memberId = userRecord.uid;
+      uid = userRecord.uid;
     } catch (createUserError) {
       throwError(`auth createUser error:${createUserError.message}`);
     }
 
     const claims = { isAdmin, isMember, isCurator };
     try {
-      await admin.auth().setCustomUserClaims(memberId, claims);
+      await admin.auth().setCustomUserClaims(uid, claims);
     } catch (e) {
-      throwError(`setCustomUserClaims ${memberId} ${claims} error:${e.message}`);
+      throwError(`setCustomUserClaims ${uid} ${claims} error:${e.message}`);
     }
 
     try {
-      const member = { phoneNumber, displayName, house, apt, isAdmin, isMember, isCurator, aptSquare }
-      await admin.firestore().collection("members").doc(memberId).set(member);
-      return { member };
+      const member = {
+        phoneNumber,
+        displayName,
+        house,
+        apt,
+        isAdmin,
+        isMember,
+        isCurator,
+        aptSquare,
+        uid
+      };
+      await admin.firestore().collection("members").doc(uid).set(member);
+      return { ...member };
     } catch (membersCollectionError) {
-      throwError(`add to members collection error:${membersCollectionError?.message}`);
+      throwError(`add to member collection error:${membersCollectionError?.message}`);
+    }
+    return undefined;
+  }
+);
+
+export const updateMember = functions.https.onCall(async (data, context: CallableContext) => {
+
+    checkAuth(context);
+    await checkAdminRights(context);
+    validateMember(data);
+
+    const { phoneNumber, displayName, house, apt, isAdmin = false, isMember = false, isCurator = false, aptSquare, uid } = data;
+
+    await getUserByUid(uid);
+
+    try {
+      await admin.auth().updateUser(uid, { phoneNumber, displayName });
+    } catch (createUserError) {
+      throwError(`auth updateUser error:${createUserError.message}`);
     }
 
+    const claims = { isAdmin, isMember, isCurator };
+    try {
+      await admin.auth().setCustomUserClaims(uid, claims);
+    } catch (e) {
+      throwError(`auth setCustomUserClaims ${uid} ${claims} error:${e.message}`);
+    }
+
+    try {
+      const member = {
+        phoneNumber,
+        displayName,
+        house,
+        apt,
+        isAdmin,
+        isMember,
+        isCurator,
+        aptSquare,
+      };
+      await admin.firestore().collection("members").doc(uid).update(member);
+      return { ...member, uid };
+    } catch (membersCollectionError) {
+      throwError(`update member collection error:${membersCollectionError?.message}`);
+    }
+    return undefined;
+  }
+);
+
+export const deleteMember = functions.https.onCall(async (data, context: CallableContext) => {
+
+    checkAuth(context);
+    await checkAdminRights(context);
+
+    const uid  = data;
+
+    await getUserByUid(uid);
+
+    try {
+      await admin.auth().deleteUser(uid);
+    } catch (createUserError) {
+      throwError(`auth deleteUser error:${createUserError.message}`);
+    }
+
+    try {
+      await admin.firestore().collection("members").doc(uid).delete();
+      return uid;
+    } catch (membersCollectionError) {
+      throwError(`delete member collection error:${membersCollectionError?.message}`);
+    }
     return undefined;
   }
 );

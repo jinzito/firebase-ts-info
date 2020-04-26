@@ -5,7 +5,6 @@ import { uiConfig, authInstance } from "../config/firebase";
 
 const SignInPage: React.FC = () => {
 
-
   return (
     <div>
       <h1>Sign In Page</h1>

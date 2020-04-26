@@ -1,4 +1,6 @@
 import firebase from 'firebase';
+import { functions } from "firebase";
+
 export const {
   REACT_APP_CONFIG_API_KEY,
   REACT_APP_CONFIG_AUTH_DOMAIN,
@@ -42,11 +44,9 @@ export const uiConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(config);
 }
-const authInstance = firebase.auth();
 
-
-export {
-  authInstance,
-};
-
-export default firebase;
+export const authInstance = firebase.auth();
+export const getMembersList = functions().httpsCallable("getMembersList");
+export const createMember = functions().httpsCallable("createMember");
+export const updateMember = functions().httpsCallable("updateMember");
+export const deleteMember = functions().httpsCallable("deleteMember");

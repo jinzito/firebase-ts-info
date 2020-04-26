@@ -28,3 +28,5 @@ package-lock.json
 browserstack.err
 debug.log
 report/*.xml
+
+_images
