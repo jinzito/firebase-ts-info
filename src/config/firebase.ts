@@ -1,5 +1,5 @@
 import firebase, { functions } from 'firebase';
-import { VoteVo } from "../app/model";
+import { VoteVO } from "../app/model";
 
 export const {
   REACT_APP_CONFIG_API_KEY,
@@ -52,4 +52,16 @@ export const authInstance = firebase.auth();
 export const createMember = functions().httpsCallable("createMember");
 export const updateMember = functions().httpsCallable("updateMember");
 export const deleteMember = functions().httpsCallable("deleteMember");
-export const addVote = (vote: VoteVo) => db.collection("votes").add(vote);
+export const addVote = (vote: VoteVO) => db.collection("votes").add(vote);
+export const getVotes = async () => {
+  try {
+    const qs = await db.collection('votes').get();
+    const result: VoteVO[] = [];
+    qs.forEach((doc) => {
+      result.push(doc.data() as VoteVO);
+    });
+    return Promise.resolve(result);
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};

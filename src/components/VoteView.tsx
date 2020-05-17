@@ -6,6 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import { VoteVO } from "../app/model";
 
 
 const useStyles = makeStyles({
@@ -26,18 +27,19 @@ const useStyles = makeStyles({
   },
 });
 
-const VoteView = () => {
+interface VoteViewProps {
+  vote: VoteVO;
+}
+
+const VoteView: React.FC<VoteViewProps> = ({ vote }: VoteViewProps) => {
+  const { title } = vote || {};
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
   return (
     <Container>
       <Card className={classes.root}>
         <CardContent>
           <Typography className={classes.title} color="textSecondary" gutterBottom>
-            Word of the Day
-          </Typography>
-          <Typography variant="h5" component="h2">
-            be{bull}nev{bull}o{bull}lent
+            {title}
           </Typography>
           <Typography className={classes.pos} color="textSecondary">
             adjective

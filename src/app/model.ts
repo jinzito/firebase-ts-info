@@ -16,7 +16,7 @@ export interface MemberVO extends DocumentData {
   isCurator?: boolean;
 }
 
-export interface VoteVo extends DocumentData {
+export interface VoteVO extends DocumentData {
   startDate: Date,
   endDate: Date,
   title: string;
