@@ -15,3 +15,10 @@ export interface MemberVO extends DocumentData {
   isMember?: boolean;
   isCurator?: boolean;
 }
+
+export interface VoteVo extends DocumentData {
+  startDate: Date,
+  endDate: Date,
+  title: string;
+  answers: string[];
+}
