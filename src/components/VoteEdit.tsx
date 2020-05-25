@@ -7,9 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Alert from '@material-ui/lab/Alert';
-
 import { RadioAnswers } from "./RadioAnswers";
-
 import { TextField } from "@material-ui/core";
 import {
   DateRangePicker,
@@ -19,6 +17,7 @@ import {
 } from "@material-ui/pickers";
 import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns';
 import { addVote } from "../config/firebase";
+import { firestore } from "firebase";
 
 const useStyles = makeStyles({
   root: {
@@ -45,7 +44,6 @@ const useStyles = makeStyles({
   }
 
 });
-
 const VoteEdit = () => {
 
   const classes = useStyles();
@@ -53,13 +51,12 @@ const VoteEdit = () => {
   const [selectedDate, handleDateChange] = React.useState<DateRange>([null, null]);
   const [answers, setAnswers] = useState([]);
   const [error, setError] = useState(undefined);
-
   const saveVote = async () => {
     setError("");
     try {
       await addVote({
-        startDate: selectedDate[0],
-        endDate: selectedDate[1],
+        beginDate: firestore.Timestamp.fromDate(selectedDate[0]),
+        endDate: firestore.Timestamp.fromDate(selectedDate[1]),
         title,
         answers
       });
