@@ -49,7 +49,7 @@ const VoteViewSummary: React.FC<VoteViewSummaryProps> =
         </Typography>
         {answers.map((answerText, i) =>
           <div key={`summary-item-${i}`}>
-            <div>{answerText} {i == answerIndex && ` - You choose`}</div>
+            <div>{answerText} {i === answerIndex && ` - You choose`}</div>
             <BorderLinearProgress
               value={totalMembers > 0  && votesCount[i] > 0 ? votesCount[i] * 100 / totalMembers : 0}
               variant="determinate"
