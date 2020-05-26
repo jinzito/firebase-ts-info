@@ -43,9 +43,6 @@ const LandingPage = () => {
       </>
 
       <VoteEdit />
-      <VoteEdit />
-      <VoteEdit />
-      <VoteEdit />
     </div>
   );
 };

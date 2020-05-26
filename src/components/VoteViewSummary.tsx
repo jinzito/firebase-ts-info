@@ -33,7 +33,7 @@ const BorderLinearProgress = withStyles({
 
 const VoteViewSummary: React.FC<VoteViewSummaryProps> =
   ({
-     voteSummary: { totalMembers, totalSquares, votesCount, votesCountBySquare } = {},
+     voteSummary: { totalMembers, votedMembers, totalSquares, votesCount, votesCountBySquare } = {},
      answerIndex = -1,
      answers = []
    }: VoteViewSummaryProps) => {
@@ -41,7 +41,11 @@ const VoteViewSummary: React.FC<VoteViewSummaryProps> =
     return (
       <>
         <Typography className={classes.title} gutterBottom>
-          {`Total voted members:${totalMembers}`}
+          {`Vote overall progress: ${votedMembers}/${totalMembers}`}
+          <BorderLinearProgress
+            value={totalMembers > 0  && votedMembers > 0 ? votedMembers * 100 / totalMembers : 0}
+            variant="determinate"
+          />
         </Typography>
         {answers.map((answerText, i) =>
           <div key={`summary-item-${i}`}>

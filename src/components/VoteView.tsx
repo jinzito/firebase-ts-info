@@ -21,7 +21,7 @@ const useStyles = makeStyles({
     fontSize: 16,
   },
   progress: {
-    width: "100%"
+    // width: "100%"
   }
 });
 
