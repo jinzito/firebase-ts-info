@@ -9,10 +9,12 @@ import { EventsList } from "./pages/EventsList";
 import { SignOutPage } from "./pages/SignOutPage";
 import { SignInDevPage } from "./pages/SignInDevPage";
 import { AppHeader } from "./pages/AppHeader";
-const App = () =>
-  <BrowserRouter>
+
+const App = (resource: any) => {
+  console.log(">>resource:", resource)
+  return (<BrowserRouter>
     <div>
-      <AppHeader/>
+      <AppHeader />
       <Switch>
         <Route path={AppRoutes.SIGN_IN} component={SignInPage} />
         <Route path={AppRoutes.SIGN_IN_DEV} component={SignInDevPage} />
@@ -24,6 +26,7 @@ const App = () =>
         <Route path={AppRoutes.LANDING} component={LandingPage} />
       </Switch>
     </div>
-  </BrowserRouter>;
+  </BrowserRouter>);
+};
 
 export default App;

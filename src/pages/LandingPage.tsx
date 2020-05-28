@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { getVotes } from "../config/firebase";
 import { VoteVO } from "../app/model";
 import VoteView from "../components/VoteView";
+import DateLabel from "../components/DateLabel";
 // import { Paper } from '@material-ui/core';
 // import { Typography } from '@material-ui/core';
 
@@ -42,7 +43,8 @@ const LandingPage = () => {
       {list.map((voteVO) => <VoteView vote={voteVO}/>)}
       </>
 
-      <VoteEdit />
+      <DateLabel/>
+      <VoteEdit key={`k1`} />
     </div>
   );
 };

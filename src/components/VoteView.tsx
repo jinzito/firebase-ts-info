@@ -66,6 +66,7 @@ const VoteView: React.FC<VoteViewProps> = ({ vote }: VoteViewProps) => {
       const d = await getVoteDetails(vote.id);
       setIsDetailsLoaded(true);
       setSavedAnswerIndex(d?.data?.answerIndex);
+      setIsVoteMode(!d?.data?.answerIndex)
       setSummary(d?.summary);
     })();
   }, []);
@@ -112,7 +113,7 @@ const VoteView: React.FC<VoteViewProps> = ({ vote }: VoteViewProps) => {
             {isDetailsLoaded && answerIndex !== savedAnswerIndex && isVoteMode ? 'Save Changs' : 'Place Vote'}
           </Button>
           }
-          {isDetailsLoaded && isVoteMode &&
+          {isDetailsLoaded && isVoteMode && savedAnswerIndex >= 0 &&
           <Button onClick={() => setIsVoteMode(false)} size="small">
             Cancel
           </Button>

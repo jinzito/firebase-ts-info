@@ -41,7 +41,7 @@ const VoteViewSummary: React.FC<VoteViewSummaryProps> =
     return (
       <>
         <Typography className={classes.title} gutterBottom>
-          {`Vote overall progress: ${votedMembers}/${totalMembers}`}
+          {`Vote overall progress: ${votedMembers || 0}/${totalMembers || 0}`}
           <BorderLinearProgress
             value={totalMembers > 0  && votedMembers > 0 ? votedMembers * 100 / totalMembers : 0}
             variant="determinate"
