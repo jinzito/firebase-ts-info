@@ -69,7 +69,7 @@ const VoteView: React.FC<VoteViewProps> = ({ vote }: VoteViewProps) => {
       setIsVoteMode(!d?.data?.answerIndex)
       setSummary(d?.summary);
     })();
-  }, []);
+  }, [vote.id]);
 
   return (
     <Container>

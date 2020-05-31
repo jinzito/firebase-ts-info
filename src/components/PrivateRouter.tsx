@@ -1,28 +1,49 @@
 import React from 'react';
 import { Route, Redirect } from "react-router-dom";
 import { RouteComponentProps, withRouter } from 'react-router';
-import { auth } from 'firebase/app';
+import { setUserAction, getUserDataAction } from "../app/auth/action";
+import { connect } from "react-redux";
+import { RootState } from "../rootReducer";
+import { RouteProps } from "react-router";
+import { AppRoutes } from "../config/routes";
 
 interface PrivateRouteProps {
-  path: string;
-  component: React.Component | React.FC<any>;
+  component: React.ComponentType<RouteComponentProps<any>>;
 }
 
-type Props = PrivateRouteProps & RouteComponentProps;
+interface ReduxStateProps {
+  isAuthenticated?: boolean;
+  isLoading: boolean;
+}
 
-const PrivateRoute: React.FC<Props> = ({ path, component, location }) =>
-  isAuthenticated() ? (
-    <Route path={path} component={component as any} />
-  ) : (
-    <Redirect
-      to={{ pathname: "/login", state: { from: location } }}
-    />
-  );
+type Props = PrivateRouteProps & RouteComponentProps & ReduxStateProps & RouteProps;
 
-const isAuthenticated = (): boolean => {
-  console.log("isAuthenticated", !!auth().currentUser, auth().currentUser);
-  return !!auth().currentUser;
-};
+const PrivateRoute: React.FC<Props> =
+  ({ component: Component, isAuthenticated, isLoading, location, ...rest}) => {
+    if (!Component) {
+      return null;
+    }
+    if (isLoading) {
+      return (
+        <div>Loading...</div>
+      );
+    }
+    return (
+      isAuthenticated ?
+        <Route
+          {...rest}
+          render={(props) => <Component {...{ ...props, location}} />}
+        /> :
+        <Redirect  to={{ pathname: AppRoutes.SIGN_IN, state: { from: location } }} />
+    );
+  };
 
-export default withRouter(PrivateRoute);
+const mapStateToProps = (state: RootState) => ({
+  isAuthenticated: state?.auth?.isAuthenticated,
+  isLoading: state?.auth?.isAuthLoading
+});
 
+const mapDispatchToProps = { setUser: setUserAction, getUserData: getUserDataAction };
+const PrivateRouterConnected = connect(mapStateToProps, mapDispatchToProps)(PrivateRoute);
+
+export default withRouter(PrivateRouterConnected);

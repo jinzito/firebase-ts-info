@@ -4,17 +4,34 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-const xhttp:XMLHttpRequest = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
-  if (this.readyState == 4 && this.status == 200) {
-    // Typical action to be performed when the document is ready:
-    const data: any = JSON.parse(xhttp.responseText) || {};
-    ReactDOM.render(<App resource={data}/>, document.getElementById('root'));
-  }
-};
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk';
+import rootReducer from "./rootReducer";
 
-xhttp.open("GET", `text-resources.json`, true);
-xhttp.send();
+const store = createStore(
+  rootReducer,
+  applyMiddleware(thunk)
+)
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
+
+// const xhttp:XMLHttpRequest = new XMLHttpRequest();
+// xhttp.onreadystatechange = function() {
+//   if (this.readyState === 4 && this.status === 200) {
+//     // Typical action to be performed when the document is ready:
+//     const data: any = JSON.parse(xhttp.responseText) || {};
+//     ReactDOM.render(<App resource={data}/>, document.getElementById('root'));
+//   }
+// };
+//
+// xhttp.open("GET", `text-resources.json`, true);
+// xhttp.send();
 
 
 // If you want your app to work offline and load faster, you can change

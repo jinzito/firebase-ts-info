@@ -1,4 +1,6 @@
-import firebase, { functions } from 'firebase';
+import { apps, functions, initializeApp, firestore } from 'firebase/app';
+import * as firebase from 'firebase';
+
 import { VoteVO, VoteDetailsVO } from "../app/model";
 
 export const {
@@ -44,9 +46,9 @@ export const uiConfig = {
 
 let db;
 
-if (!firebase.apps.length) {
-  const app = firebase.initializeApp(config);
-  db = firebase.firestore(app);
+if (!apps.length) {
+  const app = initializeApp(config);
+  db = firestore(app);
 }
 
 export const authInstance = firebase.auth();

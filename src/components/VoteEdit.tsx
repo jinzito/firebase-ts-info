@@ -17,7 +17,7 @@ import {
 } from "@material-ui/pickers";
 import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns';
 import { addVote } from "../config/firebase";
-import { firestore } from "firebase";
+import { firestore } from "firebase/app";
 
 const useStyles = makeStyles({
   root: {

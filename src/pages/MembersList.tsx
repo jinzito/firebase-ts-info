@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { firestore } from "firebase";
+import { firestore } from "firebase/app";
 import { MemberVO } from "../app/model";
 import MaterialTable from "material-table";
 import { isEmpty } from "lodash";

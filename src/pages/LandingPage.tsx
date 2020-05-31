@@ -12,6 +12,7 @@ const useStyles = makeStyles({
   root: {
     backgroundColor: '#e8e8e8',
     padding: '2rem',
+    paddingTop: "5rem"
     // display: 'flex',
     // position: 'relative',
     // justifyContent: 'center'

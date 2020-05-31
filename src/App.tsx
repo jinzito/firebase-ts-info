@@ -1,32 +1,52 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { AppRoutes } from "./config/routes";
 import LandingPage from "./pages/LandingPage";
 import { SignInPage } from "./pages/SignInPage";
 import { MembersList } from "./pages/MembersList";
-import { EventsList } from "./pages/EventsList";
 import { SignOutPage } from "./pages/SignOutPage";
 import { SignInDevPage } from "./pages/SignInDevPage";
 import { AppHeader } from "./pages/AppHeader";
+import PrivateRoute from "./components/PrivateRouter";
+import { AvoidRoutes } from "./components/AvoidRoutes";
+import { connect } from "react-redux";
+import { authInstance } from "./config/firebase";
+import { setUserAction, getUserDataAction } from "./app/auth/action";
 
-const App = (resource: any) => {
-  console.log(">>resource:", resource)
-  return (<BrowserRouter>
-    <div>
-      <AppHeader />
+
+interface DispatchProps {
+  setUser: (user: any) => void;
+  getUserData: (uid: string) => void;
+}
+
+type Props = DispatchProps;
+
+const App: React.FC<Props> = ({ setUser, getUserData }:Props) => {
+
+  useEffect(() => {
+    authInstance.onAuthStateChanged((user) => {
+      setUser(user);
+      getUserData(user?.uid);
+    })
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <AvoidRoutes routes={[AppRoutes.SIGN_IN, AppRoutes.SIGN_OUT]}>
+        <AppHeader />
+      </AvoidRoutes>
       <Switch>
         <Route path={AppRoutes.SIGN_IN} component={SignInPage} />
         <Route path={AppRoutes.SIGN_IN_DEV} component={SignInDevPage} />
-        {/*<PrivateRoute path={AppRoutes.MEMBERS} component={MembersList} />*/}
-        <Route path={AppRoutes.MEMBERS} component={MembersList} />
-        <Route path={AppRoutes.EVENTS} component={EventsList} />
+        <PrivateRoute path={AppRoutes.MEMBERS} component={MembersList} />
         <Route path={AppRoutes.SIGN_OUT} component={SignOutPage} />
-
-        <Route path={AppRoutes.LANDING} component={LandingPage} />
+        <PrivateRoute path={AppRoutes.LANDING} component={LandingPage} />
       </Switch>
-    </div>
-  </BrowserRouter>);
+    </BrowserRouter>
+  );
 };
 
-export default App;
+const mapDispatchToProps = { setUser: setUserAction, getUserData: getUserDataAction };
+const AppContainer = connect(null, mapDispatchToProps)(App);
+export default AppContainer;
