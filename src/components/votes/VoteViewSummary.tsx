@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles, withStyles, lighten } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { VoteSummaryVO } from "../app/model";
+import { VoteSummaryVO } from "../../app/model";
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles({

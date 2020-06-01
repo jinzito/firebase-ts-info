@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/app";
-import { MemberVO } from "../app/model";
+import { MemberVO } from "../model";
 import MaterialTable from "material-table";
 import { isEmpty } from "lodash";
 
 import './MembersList.scss';
-import { createMember, updateMember, deleteMember } from "../config/firebase";
+import { createMember, updateMember, deleteMember } from "../../config/firebase";
 
 const MembersList: React.FC = () => {
 

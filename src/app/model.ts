@@ -4,6 +4,13 @@ export interface FirebaseVO {
   doc: QueryDocumentSnapshot<DocumentData>
 }
 
+
+export interface UserClaims {
+  isAdmin?: boolean
+  isMember?: boolean;
+  isCurator?: boolean;
+}
+
 export interface MemberVO extends DocumentData {
   uid?: string
   displayName?: string;

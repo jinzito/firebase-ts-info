@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import VoteEdit from "../components/VoteEdit";
+import VoteEdit from "../../components/votes/VoteEdit";
 import { makeStyles } from "@material-ui/core/styles";
-import { getVotes } from "../config/firebase";
-import { VoteVO } from "../app/model";
-import VoteView from "../components/VoteView";
-import DateLabel from "../components/DateLabel";
+import { getVotes } from "../../config/firebase";
+import { VoteVO } from "../model";
+import VoteView from "../../components/votes/VoteView";
+import DateLabel from "../../components/DateLabel";
 // import { Paper } from '@material-ui/core';
 // import { Typography } from '@material-ui/core';
 

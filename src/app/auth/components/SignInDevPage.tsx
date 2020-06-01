@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { authInstance } from "../config/firebase";
+import { authInstance } from "../../../config/firebase";
 import { UserCredential } from "@firebase/auth-types";
 
 export const {

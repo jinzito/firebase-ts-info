@@ -6,9 +6,9 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import { VoteVO, VoteSummaryVO, VoteDetailsVO } from "../app/model";
+import { VoteVO, VoteSummaryVO, VoteDetailsVO } from "../../app/model";
 import { Radio, RadioGroup, FormControlLabel } from "@material-ui/core";
-import { placeVote, getVoteDetails } from "../config/firebase";
+import { placeVote, getVoteDetails } from "../../config/firebase";
 import VoteViewSummary from "./VoteViewSummary";
 import LinearProgress from '@material-ui/core/LinearProgress';
 

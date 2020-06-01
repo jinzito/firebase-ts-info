@@ -1,11 +1,11 @@
 import React from 'react';
 import { Route, Redirect } from "react-router-dom";
 import { RouteComponentProps, withRouter } from 'react-router';
-import { setUserAction, getUserDataAction } from "../app/auth/action";
+import { setUserAction, getUserDataAction } from "../../app/auth/action";
 import { connect } from "react-redux";
-import { RootState } from "../rootReducer";
+import { RootState } from "../../rootReducer";
 import { RouteProps } from "react-router";
-import { AppRoutes } from "../config/routes";
+import { AppRoutes } from "../../config/routes";
 
 interface PrivateRouteProps {
   component: React.ComponentType<RouteComponentProps<any>>;
