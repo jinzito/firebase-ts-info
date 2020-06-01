@@ -110,12 +110,12 @@ const VoteView: React.FC<VoteViewProps> = ({ vote }: VoteViewProps) => {
             disabled={isDetailsLoaded && answerIndex < 0}
             onClick={() => placeVoteRequest()}
           >
-            {isDetailsLoaded && answerIndex !== savedAnswerIndex && isVoteMode ? 'Save Changs' : 'Place Vote'}
+            {isDetailsLoaded && answerIndex !== savedAnswerIndex && isVoteMode ? 'Сохранить измемения' : 'Проголосовать'}
           </Button>
           }
           {isDetailsLoaded && isVoteMode && savedAnswerIndex >= 0 &&
           <Button onClick={() => setIsVoteMode(false)} size="small">
-            Cancel
+            Отменить
           </Button>
           }
           {isDetailsLoaded && !isVoteMode &&
@@ -123,7 +123,7 @@ const VoteView: React.FC<VoteViewProps> = ({ vote }: VoteViewProps) => {
             setIsVoteMode(true);
             setAnswerIndex(savedAnswerIndex);
           }} size="small">
-            Change saved Vote
+            Изменить выбор
           </Button>
           }
 

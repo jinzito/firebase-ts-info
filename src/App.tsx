@@ -25,11 +25,12 @@ type Props = DispatchProps;
 const App: React.FC<Props> = ({ setUser, getUserData }:Props) => {
 
   useEffect(() => {
+    // TODO: set another way to use callback, because it add callback in each didMount
     authInstance.onAuthStateChanged((user) => {
       setUser(user);
       getUserData(user?.uid);
     })
-  }, []);
+  }, [setUser, getUserData]);
 
   return (
     <BrowserRouter>

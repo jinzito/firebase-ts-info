@@ -56,6 +56,6 @@ const mapStateToProps = (state: RootState) => ({
   userName: state?.auth?.userName
 });
 
-const PrivateRouterConnected = connect(mapStateToProps)(AppHeader);
+const AppHeaderConnected = connect(mapStateToProps)(AppHeader);
 
-export default withRouter(PrivateRouterConnected);
+export default withRouter(AppHeaderConnected);

@@ -1,7 +1,7 @@
 import { apps, functions, initializeApp, firestore } from 'firebase/app';
 import * as firebase from 'firebase';
 
-import { VoteVO, VoteDetailsVO } from "../app/model";
+import { VoteVO, VoteDetailsVO, InfoVO } from "../app/model";
 
 export const {
   REACT_APP_CONFIG_API_KEY,
@@ -94,3 +94,17 @@ export const getVoteDetails = async (voteId: string) => {
 };
 
 export const placeVote = (data: { voteId: string, answerIndex: number }) => functions().httpsCallable("placeVote")(data);
+
+export const getInfos = async () => {
+  try {
+    const qs = await db.collection('infos').get();
+    const result: InfoVO[] = [];
+    qs.forEach((doc) => {
+      result.push({ ...doc.data(), id: doc.id } as InfoVO);
+    });
+    return Promise.resolve(result);
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+export const addInfo = (info: InfoVO) => db.collection("infos").add(info);

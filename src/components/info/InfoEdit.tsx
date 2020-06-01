@@ -7,16 +7,10 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Alert from '@material-ui/lab/Alert';
-import { RadioAnswers } from "./RadioAnswers";
 import { TextField } from "@material-ui/core";
-import {
-  DateRangePicker,
-  DateRange,
-  DateRangeDelimiter,
-  LocalizationProvider
-} from "@material-ui/pickers";
+import { LocalizationProvider, DatePicker } from "@material-ui/pickers";
 import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns';
-import { addVote } from "../../config/firebase";
+import { addInfo } from "../../config/firebase";
 import { firestore } from "firebase/app";
 
 const useStyles = makeStyles({
@@ -45,25 +39,25 @@ const useStyles = makeStyles({
 
 });
 
-interface VoteEditProps {
-  onCancel: () => void
+interface InfoEditProps {
+  onCancel: () => void;
 }
 
-const VoteEdit: React.FC<VoteEditProps> = ({ onCancel }: VoteEditProps) => {
+const InfoEdit: React.FC<InfoEditProps> = ({ onCancel }: InfoEditProps) => {
 
   const classes = useStyles();
   const [title, setTitle] = useState('');
-  const [selectedDate, handleDateChange] = React.useState<DateRange>([null, null]);
-  const [answers, setAnswers] = useState([]);
+  const [text, setText] = useState('');
+  const [selectedDate, handleDateChange] = React.useState<Date>(null);
   const [error, setError] = useState(undefined);
-  const saveVote = async () => {
+
+  const saveInfo = async () => {
     setError("");
     try {
-      await addVote({
-        beginDate: firestore.Timestamp.fromDate(selectedDate[0]),
-        endDate: firestore.Timestamp.fromDate(selectedDate[1]),
+      await addInfo({
+        date: firestore.Timestamp.fromDate(selectedDate),
         title,
-        answers
+        text
       });
       setError("success");
     } catch (e) {
@@ -77,18 +71,10 @@ const VoteEdit: React.FC<VoteEditProps> = ({ onCancel }: VoteEditProps) => {
         <CardContent>
           {error && <Alert severity="error">{error}</Alert>}
           <LocalizationProvider dateAdapter={DateFnsAdapter}>
-            <DateRangePicker
-              startText="Check-in"
-              endText="Check-out"
+            <DatePicker
+              renderInput={props => <TextField {...props} />}
               value={selectedDate}
               onChange={date => handleDateChange(date)}
-              renderInput={(startProps, endProps) => (
-                <>
-                  <TextField {...startProps} />
-                  <DateRangeDelimiter> to </DateRangeDelimiter>
-                  <TextField {...endProps} />
-                </>
-              )}
             />
           </LocalizationProvider>
           <TextField
@@ -98,15 +84,17 @@ const VoteEdit: React.FC<VoteEditProps> = ({ onCancel }: VoteEditProps) => {
             value={title}
             onChange={(e) => setTitle(e?.target?.value || "")}
           />
-          <RadioAnswers
-            className={classes.answers}
-            setAnswers={setAnswers}
-            answers={answers}
+          <TextField
+            label="Text"
+            multiline
+            fullWidth={true}
+            value={text}
+            onChange={(e) => setText(e?.target?.value || "")}
           />
         </CardContent>
 
         <CardActions>
-          <Button onClick={saveVote} className={classes.expand}> Создать </Button>
+          <Button onClick={saveInfo} className={classes.expand}> Сохранить </Button>
           <Button onClick={() => onCancel()} className={classes.expand}> Отменить </Button>
         </CardActions>
       </Card>
@@ -114,4 +102,4 @@ const VoteEdit: React.FC<VoteEditProps> = ({ onCancel }: VoteEditProps) => {
   );
 };
 
-export default VoteEdit;
+export default InfoEdit;

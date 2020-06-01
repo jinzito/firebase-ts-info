@@ -33,6 +33,14 @@ export interface VoteVO extends DocumentData {
   ref?: any;
 }
 
+export interface InfoVO extends DocumentData {
+  id?: string;
+  date: Timestamp;
+  title: string;
+  text: string;
+}
+
+
 export interface VoteDataVO extends DocumentData {
   voteId?: string;
   uid?: string;
