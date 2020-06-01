@@ -42,11 +42,11 @@ const VoteViewSummary: React.FC<VoteViewSummaryProps> =
       <>
         <Typography className={classes.title} gutterBottom>
           {`Vote overall progress: ${votedMembers || 0}/${totalMembers || 0}`}
-          <BorderLinearProgress
-            value={totalMembers > 0  && votedMembers > 0 ? votedMembers * 100 / totalMembers : 0}
-            variant="determinate"
-          />
         </Typography>
+        <BorderLinearProgress
+          value={totalMembers > 0  && votedMembers > 0 ? votedMembers * 100 / totalMembers : 0}
+          variant="determinate"
+        />
         {answers.map((answerText, i) =>
           <div key={`summary-item-${i}`}>
             <div>{answerText} {i === answerIndex && ` - You choose`}</div>

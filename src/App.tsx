@@ -7,7 +7,7 @@ import { SignInPage } from "./app/auth/components/SignInPage";
 import { MembersList } from "./app/members/MembersList";
 import { SignOutPage } from "./app/auth/components/SignOutPage";
 import { SignInDevPage } from "./app/auth/components/SignInDevPage";
-import { AppHeader } from "./app/AppHeader";
+import AppHeader from "./app/AppHeader";
 import PrivateRoute from "./components/common/PrivateRouter";
 import { AvoidRoutes } from "./components/AvoidRoutes";
 import { connect } from "react-redux";
@@ -33,14 +33,14 @@ const App: React.FC<Props> = ({ setUser, getUserData }:Props) => {
 
   return (
     <BrowserRouter>
-      <AvoidRoutes routes={[AppRoutes.SIGN_IN, AppRoutes.SIGN_OUT]}>
+      <AvoidRoutes routes={[AppRoutes.SIGN_IN]}>
         <AppHeader />
       </AvoidRoutes>
       <Switch>
         <Route path={AppRoutes.SIGN_IN} component={SignInPage} />
         <Route path={AppRoutes.SIGN_IN_DEV} component={SignInDevPage} />
         <PrivateRoute path={AppRoutes.MEMBERS} component={MembersList} />
-        <Route path={AppRoutes.SIGN_OUT} component={SignOutPage} />
+        <PrivateRoute path={AppRoutes.SIGN_OUT} component={SignOutPage} />
         <PrivateRoute path={AppRoutes.LANDING} component={LandingPage} />
       </Switch>
     </BrowserRouter>

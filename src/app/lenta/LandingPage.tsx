@@ -41,7 +41,7 @@ const LandingPage = () => {
       {/*  <Typography variant={"h4"}> Тестовый опрос номер 2</Typography>*/}
       {/*</Paper>*/}
       <>
-      {list.map((voteVO) => <VoteView vote={voteVO}/>)}
+      {list.map((voteVO, i) => <VoteView vote={voteVO} key={`vote-${i}`}/>)}
       </>
 
       <DateLabel/>

@@ -14,6 +14,7 @@ export interface AuthState {
   isAdmin: boolean;
   isMember: boolean;
   isCurator: boolean;
+  userName: string;
 }
 
 export const initialState = (): AuthState => ({
@@ -21,16 +22,19 @@ export const initialState = (): AuthState => ({
   isAuthenticated: false,
   isAdmin: false,
   isMember: false,
-  isCurator: false
+  isCurator: false,
+  userName: undefined
 
 });
 
 export default (state = initialState(), action: Action): AuthState => {
   switch (action.type) {
     case SET_USER:
+      const { uid, displayName }: any = (action as PayloadAction<any>)?.payload || {}
       return {
         ...state,
-        isAuthenticated: !isEmpty((action as any)?.payload?.uid),
+        isAuthenticated: !isEmpty(uid),
+        userName: displayName,
         isAuthLoading: false
       };
     case SET_USER_ROLE:

@@ -7,7 +7,6 @@ const SignOutPage = () => {
     (async () => {
       try {
         await auth().signOut();
-        console.log("currentUser:", auth().currentUser);
       } catch (e) {
         console.log("error", e);
       }
@@ -17,7 +16,7 @@ const SignOutPage = () => {
 
   return (
     <div>
-      <h1>SignOut</h1>
+      <h3>Выходим из системы...</h3>
     </div>
   )
 };

@@ -2,15 +2,26 @@ import React from "react";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import WhereToVoteIcon from '@material-ui/icons/WhereToVote';
 import { Link } from "react-router-dom";
 import { AppRoutes } from "../config/routes";
 
 import './AppHeader.scss';
+import { RootState } from "../rootReducer";
+import { connect } from "react-redux";
+import { withRouter, RouteComponentProps, RouteProps } from "react-router";
+import { AvoidRoutes } from "../components/AvoidRoutes";
 
-const AppHeader: React.FC = () => {
+interface ReduxStateProps {
+  isAuthenticated?: boolean;
+  isLoading: boolean;
+  userName: string;
+}
+
+type Props = RouteComponentProps & ReduxStateProps & RouteProps;
+
+const AppHeader: React.FC<Props> = ({isAuthenticated, isLoading, userName}: Props) => {
 
   return (
     <AppBar className="app-header" color="inherit">
@@ -21,13 +32,30 @@ const AppHeader: React.FC = () => {
         <Typography variant="h6" className="app-header__label" onClick={() => window.location.href = AppRoutes.LANDING}>
           ТС ЖК "Уручский"
         </Typography>
-        <li><Link to={AppRoutes.SIGN_IN}>Sign In</Link></li>
-        <li><Link to={AppRoutes.MEMBERS}>Members</Link></li>
-        <li><Link to={AppRoutes.SIGN_OUT}>Sign Out</Link></li>
-        <Button color="inherit">{"Login"}</Button>
+        {!isLoading && !isAuthenticated && (
+          <AvoidRoutes routes={AppRoutes.SIGN_IN}>
+            <Link color="inherit" to={AppRoutes.SIGN_IN}>Войти</Link>
+          </AvoidRoutes>
+        )}
+        {!isLoading && isAuthenticated && (
+          <>
+            <Typography variant="inherit">
+              {userName}{' '}
+              <Link color="inherit" to={AppRoutes.SIGN_OUT}>[Выйти]</Link>
+            </Typography>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );
 };
 
-export { AppHeader };
+const mapStateToProps = (state: RootState) => ({
+  isAuthenticated: state?.auth?.isAuthenticated,
+  isLoading: state?.auth?.isAuthLoading,
+  userName: state?.auth?.userName
+});
+
+const PrivateRouterConnected = connect(mapStateToProps)(AppHeader);
+
+export default withRouter(PrivateRouterConnected);
