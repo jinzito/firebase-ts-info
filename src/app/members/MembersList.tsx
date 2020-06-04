@@ -53,7 +53,7 @@ const MembersList: React.FC = () => {
     }
   };
 
-  const onDeleteMember = async(data: MemberVO): Promise<any> => {
+  const onDeleteMember = async (data: MemberVO): Promise<any> => {
     const { uid } = data || {};
     try {
       setIsLoading(true);
@@ -69,7 +69,7 @@ const MembersList: React.FC = () => {
       setErrorMessage(e.message);
       setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     (async () => {
@@ -88,37 +88,38 @@ const MembersList: React.FC = () => {
     })();
   }, []);
 
-  return (<div>
-    <div>{errorMessage}</div>
-    <MaterialTable
-      title="Members"
-      isLoading={isLoading}
-      options={{
-        actionsColumnIndex: -1,
-        paging: false,
-        addRowPosition: "first",
-        loadingType: "linear",
-        draggable: false
-      }}
-      columns={[
-        { title: "Phone", field: "phoneNumber" },
-        { title: "Name", field: "displayName" },
-        { title: "House", field: "house", lookup: { 5: "5", 6: "6", 7: "7" } },
-        { title: "Apt", field: "apt", type: "numeric" },
-        { title: "AptSquare", field: "aptSquare", type: "numeric" },
-        { title: "admin", field: "isAdmin", type: "boolean" },
-        { title: "curator", field: "isCurator", type: "boolean" },
-        { title: "member", field: "isMember", type: "boolean", initialEditValue: true },
-      ]}
-      data={list}
-      editable={{
-        isEditable: () => true,
-        onRowAdd: (data) => onAddMember(data),
-        onRowUpdate: (data) => onUpdateMember(data),
-        onRowDelete: (data) => onDeleteMember(data)
-      }}
-    />
-  </div>);
+  return (
+    <div className="members-list">
+      <div>{errorMessage}</div>
+      <MaterialTable
+        title="Members"
+        isLoading={isLoading}
+        options={{
+          actionsColumnIndex: -1,
+          paging: false,
+          addRowPosition: "first",
+          loadingType: "linear",
+          draggable: false
+        }}
+        columns={[
+          { title: "Phone", field: "phoneNumber" },
+          { title: "Name", field: "displayName" },
+          { title: "House", field: "house", lookup: { 5: "5", 6: "6", 7: "7" } },
+          { title: "Apt", field: "apt", type: "numeric" },
+          { title: "AptSquare", field: "aptSquare", type: "numeric" },
+          { title: "admin", field: "isAdmin", type: "boolean" },
+          { title: "curator", field: "isCurator", type: "boolean" },
+          { title: "member", field: "isMember", type: "boolean", initialEditValue: true },
+        ]}
+        data={list}
+        editable={{
+          isEditable: () => true,
+          onRowAdd: (data) => onAddMember(data),
+          onRowUpdate: (data) => onUpdateMember(data),
+          onRowDelete: (data) => onDeleteMember(data)
+        }}
+      />
+    </div>);
 };
 
 export { MembersList };
