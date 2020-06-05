@@ -13,7 +13,21 @@ import { AvoidRoutes } from "./components/AvoidRoutes";
 import { connect } from "react-redux";
 import { authInstance } from "./config/firebase";
 import { setUserAction, getUserDataAction } from "./app/auth/action";
+import dateFormat from "dateformat";
 
+dateFormat.i18n = {
+  dayNames: [
+    'Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб',
+    'Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'
+  ],
+  monthNames: [
+    'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек',
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрть', 'Декабрь'
+  ],
+  timeNames: [
+    'a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'
+  ]
+};
 
 interface DispatchProps {
   setUser: (user: any) => void;

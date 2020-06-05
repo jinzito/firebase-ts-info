@@ -9,8 +9,13 @@ import { withRouter, RouteComponentProps, RouteProps } from "react-router";
 import './LandingPage.scss';
 import Button from '@material-ui/core/Button';
 import { AppRoutes } from "../../config/routes";
-import InfoView from "../../components/info/InfoView";
 import InfoEdit from "../../components/info/InfoEdit";
+import dateFormat from "dateformat";
+import { Timestamp } from '@firebase/firestore-types';
+import { keys } from 'lodash';
+import MonthGrouped, { MonthGroupedVO } from "./MonthGrouped";
+import {isEmpty} from "lodash";
+
 
 interface ReduxStateProps {
   isAdmin?: boolean;
@@ -19,17 +24,68 @@ interface ReduxStateProps {
 type Props = RouteComponentProps & ReduxStateProps & RouteProps;
 
 enum EditableItem {
-  EMPTY ,
+  EMPTY,
   INFO,
   VOTE
 }
 
-const LandingPage:React.FC<Props> = ({isAdmin}: Props) => {
+export type ItemVO = VoteVO | InfoVO;
 
-  const [votesList, setVotesList] = useState([]);
-  const [infosList, setInfosList] = useState([]);
+const getMapKey = (t: Timestamp): string =>
+  dateFormat(t.toDate(), "yyyy-mm");
 
-  const [editableItem, setEditableItem] = useState<EditableItem>(EditableItem.EMPTY)
+
+const LandingPage: React.FC<Props> = ({ isAdmin }: Props) => {
+
+  const [votesList, setVotesList] = useState<VoteVO[]>([]);
+  const [infosList, setInfosList] = useState<InfoVO[]>([]);
+
+  const [sortedList, setSortedList] = useState<MonthGroupedVO[]>([]);
+  const [topItems, setTopItems] = useState<VoteVO[]>([]);
+
+  const [editableItem, setEditableItem] = useState<EditableItem>(EditableItem.EMPTY);
+
+  useEffect(() => {
+
+    if (!isEmpty(votesList) && !isEmpty(infosList)) {
+      console.log(">>>>");
+    }
+    const topItemsResult: VoteVO[] = [];
+    const map: { [key: string]: MonthGroupedVO } = {};
+    const nowInSeconds: number = new Date().getTime() / 1000;
+    infosList.forEach(infoVO => {
+      const mapKey: string = getMapKey(infoVO?.date);
+      if (!!map[mapKey]) {
+        map[mapKey].items.push(infoVO);
+      } else {
+        map[mapKey] = { month: infoVO?.date?.toDate(), items: [infoVO] };
+      }
+    });
+    votesList.forEach(voteVO => {
+      const isNotCompleted: boolean = voteVO.endDate.seconds - nowInSeconds > 0;
+      if (isNotCompleted) {
+        topItemsResult.push(voteVO);
+      } else {
+        const mapKey: string = getMapKey(voteVO?.endDate);
+        if (!!map[mapKey]) {
+          map[mapKey].items.push(voteVO);
+        } else {
+          map[mapKey] = { month: voteVO.endDate.toDate(), items: [voteVO] };
+        }
+      }
+    });
+    const result: MonthGroupedVO[] = keys(map)
+      .map(key => map[key])
+      .sort((a: MonthGroupedVO, b: MonthGroupedVO) => a.month > b.month);
+    result.forEach(mg => mg.items.sort((a: ItemVO, b: ItemVO) => {
+        const t1: Timestamp = a?.date || a?.endDate;
+        const t2: Timestamp = b?.date || b?.endDate;
+        return t1.seconds - t2.seconds;
+      }
+    ));
+    setSortedList(result);
+    setTopItems(topItemsResult);
+  }, [votesList, infosList]);
 
   //TODO: move it to redux
   useEffect(() => {
@@ -49,7 +105,6 @@ const LandingPage:React.FC<Props> = ({isAdmin}: Props) => {
         console.log(">>> error", e);
       }
     })();
-
   }, []);
 
   return (
@@ -59,23 +114,23 @@ const LandingPage:React.FC<Props> = ({isAdmin}: Props) => {
           <Button
             className="landing-page__button"
             variant="contained"
-            onClick={() => setEditableItem(EditableItem.INFO) }
+            onClick={() => setEditableItem(EditableItem.INFO)}
           >
-              Добавить новость
+            Добавить новость
           </Button>
           <Button
             className="landing-page__button"
             variant="contained"
-            onClick={() => setEditableItem(EditableItem.VOTE) }
+            onClick={() => setEditableItem(EditableItem.VOTE)}
           >
-              Добавить голосвание
+            Добавить голосвание
           </Button>
           <Button
             className="landing-page__button"
             variant="contained"
             href={AppRoutes.MEMBERS}
           >
-              Список пользователей
+            Список пользователей
           </Button>
         </div>
       )}
@@ -85,13 +140,12 @@ const LandingPage:React.FC<Props> = ({isAdmin}: Props) => {
       {editableItem === EditableItem.INFO && (
         <InfoEdit key="infoEdit" onCancel={() => setEditableItem(EditableItem.EMPTY)} />
       )}
-
       <>
-        {votesList.map((voteVO, i) => <VoteView vote={voteVO} key={`vote-${i}`}/>)}
+      {topItems.map((voteVO, i) => <VoteView vote={voteVO} key={`top-vote-${i}`} />)}
       </>
-      <>
-        {infosList.map((infoVO, i) => <InfoView info={infoVO} key={`info-${i}`}/>)}
-      </>
+      {sortedList.map((mg, i) =>
+        <MonthGrouped group={mg} key={`mg-${i}`}/>
+      )}
     </div>
   );
 };
