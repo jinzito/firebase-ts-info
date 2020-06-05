@@ -2,20 +2,8 @@ import { Action } from "redux";
 import { SET_USER, SET_USER_ROLE } from "./action";
 
 import {isEmpty} from "lodash";
-import { UserClaims } from "../model";
-
-interface PayloadAction<P> extends Action {
-  payload:P;
-}
-
-export interface AuthState {
-  isAuthLoading: boolean;
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  isMember: boolean;
-  isCurator: boolean;
-  userName: string;
-}
+import { UserClaims, PayloadAction } from "../model";
+import { AuthState } from "./model";
 
 export const initialState = (): AuthState => ({
   isAuthLoading: true,
@@ -24,7 +12,6 @@ export const initialState = (): AuthState => ({
   isMember: false,
   isCurator: false,
   userName: undefined
-
 });
 
 export default (state = initialState(), action: Action): AuthState => {

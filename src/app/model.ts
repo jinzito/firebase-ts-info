@@ -1,9 +1,13 @@
 import { QueryDocumentSnapshot, DocumentData, Timestamp } from '@firebase/firestore-types';
+import { Action } from "redux";
 
 export interface FirebaseVO {
   doc: QueryDocumentSnapshot<DocumentData>
 }
 
+export interface PayloadAction<P> extends Action {
+  payload:P;
+}
 
 export interface UserClaims {
   isAdmin?: boolean

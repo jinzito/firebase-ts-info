@@ -2,9 +2,9 @@ import { ItemVO } from "./LandingPage";
 import React from 'react';
 import './DateLabel.scss';
 import DateLabel from "./DateLabel";
-import InfoView from "../../components/info/InfoView";
-import { InfoVO, VoteVO } from "../model";
-import VoteView from "../../components/votes/VoteView";
+import InfoView from "../../../components/info/InfoView";
+import { InfoVO, VoteVO } from "../../model";
+import VoteView from "../../../components/votes/VoteView";
 
 export interface MonthGroupedVO {
   month: Date;

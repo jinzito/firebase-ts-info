@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { AppRoutes } from "./config/routes";
-import LandingPage from "./app/lenta/LandingPage";
+import LandingPage from "./app/lent/components/LandingPage";
 import { SignInPage } from "./app/auth/components/SignInPage";
 import { MembersList } from "./app/members/MembersList";
 import { SignOutPage } from "./app/auth/components/SignOutPage";
